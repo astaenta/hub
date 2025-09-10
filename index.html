@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astaenta Space</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        body {
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .top-section {
+            height: 75vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 10vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            perspective: 1000px;
+        }
+        
+        .category {
+            width: 100%;
+            margin-bottom: 30px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 
+                0 12px 32px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.7s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            transform-style: preserve-3d;
+            will-change: transform;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1), 
+                rgba(255, 255, 255, 0.05), 
+                rgba(255, 255, 255, 0.1));
+            border-radius: 17px;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .category-title {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            text-shadow: 
+                1px 1px 3px rgba(0, 0, 0, 0.7),
+                0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .link {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.15));
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 10px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+        }
+        
+        .link::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1), 
+                rgba(255, 255, 255, 0.05), 
+                rgba(255, 255, 255, 0.1));
+            border-radius: 13px;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        
+        .link-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .link.loading {
+            pointer-events: none;
+        }
+        
+        .link .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: width 0.6s ease-out;
+            z-index: 1;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.3),
+                inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        .link.loading .loading-overlay {
+            width: 100%;
+        }
+        
+        .link i {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+            z-index: 2;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+        
+        .link-text {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            z-index: 2;
+        }
+
+        .link:hover {
+            transform: translateY(-2px) translateZ(5px);
+            box-shadow: 
+                0 6px 15px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .link:hover::before {
+            opacity: 0.8;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.2), 
+                rgba(255, 255, 255, 0.1), 
+                rgba(255, 255, 255, 0.2));
+        }
+
+        .link:active {
+            transform: translateY(1px) translateZ(0);
+            box-shadow: 
+                0 2px 5px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .link {
+                padding: 12px 15px;
+            }
+            .top-section {
+                padding-top: 5vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-section">
+        <div class="container">
+            <div class="category" id="category1">
+                <h2 class="category-title">Portfolio</h2>
+                <div class="links">
+                    <div class="link" data-url="https://www.linkedin.com/in/alejandrosebastiantestera">
+                        <div class="link-content">
+                            <i class="fab fa-linkedin"></i>
+                            <span class="link-text">LinkedIn</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                    <div class="link" data-url="https://github.com/astaenta">
+                        <div class="link-content">
+                            <i class="fab fa-github"></i>
+                            <span class="link-text">GitHub</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                    <div class="link" data-url="https://www.artstation.com/astaenta">
+                        <div class="link-content">
+                            <i class="fab fa-artstation"></i>
+                            <span class="link-text">ArtStation</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category" id="category2">
+                <h2 class="category-title">Social</h2>
+                <div class="links">
+                    <div class="link" data-url="https://www.youtube.com/@astaenta">
+                        <div class="link-content">
+                            <i class="fab fa-youtube"></i>
+                            <span class="link-text">YouTube</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                    <div class="link" data-url="https://www.instagram.com/astaenta/">
+                        <div class="link-content">
+                            <i class="fab fa-instagram"></i>
+                            <span class="link-text">Instagram</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                    <div class="link" data-url="https://bsky.app/profile/astaenta.space">
+                        <div class="link-content">
+                            <i class="fas fa-hashtag"></i>
+                            <span class="link-text">Bluesky</span>
+                        </div>
+                        <div class="loading-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.body.addEventListener('wheel', preventScroll, { passive: false });
+        document.body.addEventListener('touchmove', preventScroll, { passive: false });
+        document.body.addEventListener('keydown', preventScrollKeys);
+        
+        function preventScroll(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
+        function preventScrollKeys(e) {
+            const keys = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+            if (keys.includes(e.keyCode)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        const categories = document.querySelectorAll('.category');
+        const links = document.querySelectorAll('.link');
+        const container = document.querySelector('.container');
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let isHovering = false;
+        
+        function animate() {
+            currentX += (targetX - currentX) * 0.1;
+            currentY += (targetY - currentY) * 0.1;
+            
+            if (isHovering && !isTouchDevice) {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                
+                const moveX = (currentX - centerX) / centerX;
+                const moveY = (currentY - centerY) / centerY;
+                
+                categories.forEach((category, index) => {
+                    const factor = index === 0 ? 1 : -1;
+                    
+                    const rotateX = moveY * 3 * factor;
+                    const rotateY = moveX * -3 * factor;
+                    const translateX = moveX * 10 * factor;
+                    const translateY = moveY * 10 * factor;
+                    
+                    category.style.transform = `
+                        perspective(1000px)
+                        rotateX(${rotateX}deg)
+                        rotateY(${rotateY}deg)
+                        translateX(${translateX}px)
+                        translateY(${translateY}px)
+                        translateZ(10px)
+                    `;
+                    
+                    category.style.boxShadow = `
+                        ${-translateX/2}px ${-translateY/2}px 30px rgba(0, 0, 0, 0.6),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                        0 2px 10px rgba(0, 0, 0, 0.2)
+                    `;
+                });
+                
+                links.forEach(link => {
+                    const rect = link.getBoundingClientRect();
+                    const linkCenterX = rect.left + rect.width / 2;
+                    const linkCenterY = rect.top + rect.height / 2;
+                    
+                    const linkMoveX = (currentX - linkCenterX) / linkCenterX;
+                    const linkMoveY = (currentY - linkCenterY) / linkCenterY;
+                    
+                    link.style.transform = `
+                        perspective(1000px)
+                        rotateX(${linkMoveY * -2}deg)
+                        rotateY(${linkMoveX * 2}deg)
+                        translateZ(5px)
+                    `;
+                });
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', (e) => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+            });
+            
+            container.addEventListener('mouseenter', () => {
+                isHovering = true;
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                isHovering = false;
+                
+                categories.forEach(category => {
+                    category.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                    category.style.boxShadow = `
+                        0 12px 32px rgba(0, 0, 0, 0.6),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                        0 2px 10px rgba(0, 0, 0, 0.2)
+                    `;
+                });
+                
+                links.forEach(link => {
+                    link.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                });
+            });
+        }
+        
+        document.querySelectorAll('.link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const url = this.getAttribute('data-url');
+                
+                this.classList.add('loading');
+                
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                    this.classList.remove('loading');
+                }, 600);
+            });
+            
+            if (!isTouchDevice) {
+                link.addEventListener('mouseenter', function() {
+                    this.style.transform = 'perspective(1000px) translateZ(10px)';
+                    this.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    if (!isHovering) {
+                        this.style.transform = 'perspective(1000px) translateZ(0)';
+                        this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
